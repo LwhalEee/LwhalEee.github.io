@@ -1,0 +1,104 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="author" content="LwhalE"/><meta name="copyright" content="LwhalE"/><meta name="theme-color" content="#FFB347"/><meta name="format-detection" content="telephone=no"/><meta name="keywords" content="web"/><meta name="mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-capable" content="yes"/><meta name="apple-touch-fullscreen" content="yes"/><meta name="application-name" content="一些http | LwhalE's blog"/><meta name="apple-mobile-web-app-title" content="一些http | LwhalE's blog"/><meta name="apple-mobile-web-app-status-bar-style" content="#FFB347"/><link rel="canonical" href="https://LwhalEee.github.io/2026/01/28/一些http/"/><meta name="description" content="昨天做了两道http的简单题，就是利用POST和GET请求提交变量以及不同首部字段的理由，这里对用到的字段记录一下。 首部字段：通用，请求，响应，实体 本地访问的检测是用到了x-real-ip和X-Forward-For  X-Real-IP 是一个常用于反向代理（如 Nginx）的自定义 HTTP 请求头，旨在将客户端的真实 IP 地址传递给后端服务器。与 X-Forwarded-For不...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一些http | LwhalE&#39;s blog">
+<meta property="og:url" content="https://lwhaleee.github.io/2026/01/28/%E4%B8%80%E4%BA%9Bhttp/index.html">
+<meta property="og:site_name" content="LwhalE&#39;s blog">
+<meta property="og:description" content="昨天做了两道http的简单题，就是利用POST和GET请求提交变量以及不同首部字段的理由，这里对用到的字段记录一下。 首部字段：通用，请求，响应，实体 本地访问的检测是用到了x-real-ip和X-Forward-For  X-Real-IP 是一个常用于反向代理（如 Nginx）的自定义 HTTP 请求头，旨在将客户端的真实 IP 地址传递给后端服务器。与 X-Forwarded-For不...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lwhaleee.github.io/images/Hexo-Theme-MEOW.png">
+<meta property="article:published_time" content="2026-01-28T02:03:54.000Z">
+<meta property="article:modified_time" content="2026-01-29T06:36:45.717Z">
+<meta property="article:author" content="LwhalE">
+<meta property="article:tag" content="web">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lwhaleee.github.io/images/Hexo-Theme-MEOW.png"><meta name="robots" content="index,follow"/><meta name="googlebot" content="index,follow"/><meta name="revisit-after" content="1 days"/><title>一些http | LwhalE's blog</title><link rel="shortcut icon" href="/images/Hexo-Theme-MEOW.ico"><link rel="preconnect" href="/assets"/><link rel="preconnect" href="assets"/>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="prefetch" href="/"/><link rel="prefetch" href="/archives"/><link rel="prefetch" href="/tags"/><meta name="generator" content="Hexo 8.1.1"></head><body bg-style="none"><header><div id="navbar"><div id="nav-info"><a id="site-icon" href="/" title="主页"><img src="/images/Hexo-Theme-MEOW.png" alt="Logo"/></a><a id="site-name" href="/" title="主页"><div>LwhalE's blog</div><img src="/assets/images/svg/uc/uc-home.svg" class="icon noview" alt="Icon"></a></div><div id="nav-menu"><div class="menu-item"><a href="/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>首页</span></a></div><div class="menu-item"><a href="/archives"><img src="/assets/images/svg/uc/uc-archive.svg" class="icon noview" alt="Icon"><span>归档</span></a></div><div class="menu-item"><a href="/categories"><img src="/assets/images/svg/uc/uc-category.svg" class="icon noview" alt="Icon"><span>分类</span></a></div><div class="menu-item"><a href="/tags"><img src="/assets/images/svg/uc/uc-tag.svg" class="icon noview" alt="Icon"><span>标签</span></a></div><div class="menu-item"><a href="/about"><img src="/assets/images/svg/uc/uc-about.svg" class="icon noview" alt="Icon"><span>关于</span></a></div></div><div id="nav-function"><div id="menu-btn"><a href="javascript:void(0);" title="打开菜单"><img src="/assets/images/svg/uc/uc-menu.svg" class="icon noview" alt="Icon"></a></div></div></div></header><div id="menu-aside"><div id="menu-aside-container"><div id="menu-aside-info"><a href="/" title="主页"><img src="/images/Hexo-Theme-MEOW.png" alt="Logo"/></a><a href="/" title="主页">LwhalE's blog</a></div><div class="menu-aside-item"><a href="/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>首页</span></a></div><div class="menu-aside-item"><a href="/archives"><img src="/assets/images/svg/uc/uc-archive.svg" class="icon noview" alt="Icon"><span>归档</span></a></div><div class="menu-aside-item"><a href="/categories"><img src="/assets/images/svg/uc/uc-category.svg" class="icon noview" alt="Icon"><span>分类</span></a></div><div class="menu-aside-item"><a href="/tags"><img src="/assets/images/svg/uc/uc-tag.svg" class="icon noview" alt="Icon"><span>标签</span></a></div><div class="menu-aside-item"><a href="/about"><img src="/assets/images/svg/uc/uc-about.svg" class="icon noview" alt="Icon"><span>关于</span></a></div><hr/></div></div><main><div class="banner"><div class="banner-info"><div class="banner-avatar"><img src="/images/Hexo-Theme-MEOW.png" alt="Avatar"/></div><div class="banner-title">「 Lwhale's Blog 」</div></div></div><div class="post-container"><div class="post-main"><div class="post-content"><h1 class="post-title">一些http</h1><div class="post-author"><span>作者: LwhalE</span></div><div class="post-meta"><div class="post-info"><div class="post-date"><div class="post-pubdate"><img src="/assets/images/svg/ta/ta-pubdate.svg" class="icon noview" alt="Icon"><span>发表于2026-01-28</span></div><div class="post-update"><img src="/assets/images/svg/ta/ta-update.svg" class="icon noview" alt="Icon"><span>更新于2026-01-29</span></div></div><div class="post-read"></div></div><div class="post-attribute"><div class="post-categories"><img src="/assets/images/svg/ta/ta-category.svg" class="icon noview" alt="Icon"><span><a class="post-categories-link" href="/categories/learning/">learning</a></span></div><div class="post-tags"><img src="/assets/images/svg/ta/ta-tag.svg" class="icon noview" alt="Icon"><span><a class="post-tags-link" href="/tags/web/" rel="tag">web</a></span></div></div></div><div class="post markdown" indent="false"><p>昨天做了两道http的简单题，就是利用POST和GET请求提交变量以及不同首部字段的理由，这里对用到的字段记录一下。</p>
+<p>首部字段：通用，请求，响应，实体</p>
+<p>本地访问的检测是用到了<code>x-real-ip</code>和<code>X-Forward-For</code></p>
+<ul>
+<li>X-Real-IP 是一个常用于反向代理（如 Nginx）的自定义 HTTP 请求头，旨在将客户端的真实 IP 地址传递给后端服务器。与 X-Forwarded-For不同，它通常仅包含一个客户端 IP，直接覆盖而非追加，且在受控代理环境中具有高可信度。</li>
+<li>X-Forwarded-For(XFF) 是一个用于记录通过代理服务器或负载均衡器连接到Web服务器的客户端真实IP地址的HTTP头字段，通过伪造可以掩盖IP。</li>
+</ul>
+<p><code>Referer</code>：后跟一个URI（URL的子集），就是发起请求的URI，简单说就是溯源。就是找请求来源</p>
+<p><code>User-Agent</code>:将请求方的浏览器和用户代理名称等信息传达给服务器。（查看发起请求的浏览器或者代理名称）</p>
+<p><code>Cookie</code>:首部字段 Cookie 会告知服务器，当客户端想获得 HTTP 状态管理支持时，就会在请求中包含从服务器接收到的 Cookie。接收到多个 Cookie 时，同样可以以多个 Cookie 形式发送。</p>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th align="left">属性</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>NAME=VALUE</code></td>
+<td>赋予 Cookie 的名称和其值（必需项）</td>
+</tr>
+<tr>
+<td align="left"><code>expires=DATE</code></td>
+<td>Cookie 的有效期（若不明确指定则默认为浏览器关闭前为止）</td>
+</tr>
+<tr>
+<td align="left"><code>path=PATH</code></td>
+<td>将服务器上的文件目录作为Cookie的适用对象（若不指定则默认为文档所在的文件目录）</td>
+</tr>
+<tr>
+<td align="left"><code>domain=域名</code></td>
+<td>作为 Cookie 适用对象的域名 （若不指定则默认为创建 Cookie的服务器的域名）</td>
+</tr>
+<tr>
+<td align="left"><code>Secure</code></td>
+<td>仅在 HTTPS 安全通信时才会发送 Cookie</td>
+</tr>
+<tr>
+<td align="left"><code>HttpOnly</code></td>
+<td>加以限制，使 Cookie 不能被 JavaScript 脚本访问</td>
+</tr>
+</tbody></table></div>
+<p>每个首部上传的时候都需要注意上传格式是否有问题</p>
+<p>在另一个题中用到了Via头，表现为代理</p>
+<ul>
+<li>Via 是一个通用首部，是由代理服务器添加的，适用于正向和反向代理，在请求和响应首部中均可出现。</li>
+</ul>
+<p>后面遇到了再补充</p>
+<p>之前学习的时候主要是看文字，实际利用非常少。昨天做的题很简单，但是由于插件一直卡死，所以反复操作反复提交，真的整的有点无语，每次也就是最后那一下，所以一直硬磕搞了很久，下次别再这么搞了</p>
+</div><div class="post-reward"><div class="post-reward-btn" title="赞赏作者"><img src="/assets/images/svg/uc/uc-gift.svg" class="icon noview" alt="Icon"><span></span></div><div class="post-reward-content"><div class="post-reward-text"></div><div class="post-reward-list"><a href="/null" target="_blank">致谢名单</a></div></div></div><div class="post-copyright"><div class="post-copyright-info">本作品由 LwhalE 于 2026-01-28 10:03:54 发布</div><div class="post-copyright-link"><span>作品地址：<a href="https://lwhaleee.github.io/2026/01/28/%E4%B8%80%E4%BA%9Bhttp/">一些http</a></span><button class="copy-text" type="button" data-text="https://lwhaleee.github.io/2026/01/28/%E4%B8%80%E4%BA%9Bhttp/">复制</button></div><div class="post-copyright-detail">除特别声明外，本站作品均采用 <a href='https://creativecommons.org/licenses/by-nc-sa/4.0/' title='Attribution-NonCommercial-ShareAlike' target='_blank'>CC BY-NC-SA 4.0</a> 许可协议，转载请注明来自 <a href='/'>LwhalE's blog</a></div><img class="post-copyright-icon noview" src="/images/Hexo-Theme-MEOW.png" alt="Logo"/></div><div class="post-tail-tags"><a class="post-tail-tags-link" href="/tags/web/" rel="tag">web</a></div></div><aside id="post-sidebar" status="show"><div id="toc-container"><div class="toc-title"><img src="/assets/images/svg/ta/ta-toc.svg" class="icon noview" alt="Icon"><span>目录</span></div><div class="toc-content" id="toc-div"></div></div></aside></div></div><div id="toolbar" hide=""><div id="toolbar-setting-container" hide=""><div class="toolbar-item"><button id="tool-color-mode" title="深色模式" type="button"><img src="/assets/images/svg/ta/ta-moon.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button class="copy-text" id="tool-share" title="分享" type="button" data-text="https://lwhaleee.github.io/2026/01/28/%E4%B8%80%E4%BA%9Bhttp/"><img src="/assets/images/svg/ta/ta-share.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-font-size-plus" title="放大字体" type="button"><img src="/assets/images/svg/ta/ta-text-plus.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-font-size-minus" title="缩小字体" type="button"><img src="/assets/images/svg/ta/ta-text-minus.svg" class="icon noview" alt="Icon"></button></div></div><div class="toolbar-container"><div class="toolbar-item"><button id="tool-setting" title="设置" type="button"><img src="/assets/images/svg/ta/ta-setting.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-toc" title="目录" type="button"><img src="/assets/images/svg/ta/ta-toc.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-gototop" title="返回顶部" type="button"><img src="/assets/images/svg/ta/ta-up.svg" class="icon noview" alt="Icon"></button></div></div></div></main><footer><div class="footer"><div id="footer-copyright">© 2026 <span>💗</span> <a href="/null">LwhalE</a></div><div id="footer-info"><div id="footer-framework">🚀本站由 <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/chanwj/hexo-theme-meow" title="3.2.0" target="_blank">Meow</a> 强力驱动</div><div id="footer-runtime"><span id="runtime" data-startdate="2026-01-10T22:00:00.000Z">🌻已稳定运行.年.月.天</span></div></div></div></footer><div class="scripts"><script>const GLOBALCONFIG = {
+  root: '/',
+  toolbar: true,
+  lazyload_src: '/assets/images/Meow-Loading.webp',
+  friends: false,
+  codeblock: true,
+  share_text: '🐱Share From Meow',
+  onblur_title: 'Please Come Back～✧(´▽`ʃ♡ƪ)',
+  mouse_click: false,
+  notify:{
+    enable: false,
+    info: '复制成功～转载请标注本文地址',
+    f12_info: '开发者模式已打开，请遵循本站版权协议'
+  },
+  search: {
+    enable: false,
+    path: '',
+    local: {
+      top_n_per_article: 1,
+      preload: false
+    }
+  },
+  encrypt: false,
+};
+</script><script>if (!localStorage.getItem('color-mode')) {
+  localStorage.setItem('color-mode', 'light' || 'light');
+}
+document.body.setAttribute('data-mode', localStorage.getItem('color-mode'));
+</script>
+<script src="/js/theme/tools/utils.js"></script>
+
+<script src="/js/plugins/dist/lazyload.min.js"></script>
+
+<script src="/js/plugins/view-image.min.js"></script>
+<script>if (localStorage.getItem('font-size')) {
+  document.querySelector('.post').style.fontSize = localStorage.getItem('font-size') + 'px';
+}
+</script>
+<script src="/js/main.js" type="module"></script>
+</div></body></html>
