@@ -1,0 +1,313 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="author" content="LwhalE"/><meta name="copyright" content="LwhalE"/><meta name="theme-color" content="#FFB347"/><meta name="format-detection" content="telephone=no"/><meta name="keywords" content="web"/><meta name="mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-capable" content="yes"/><meta name="apple-touch-fullscreen" content="yes"/><meta name="application-name" content="Docker | LwhalE's blog"/><meta name="apple-mobile-web-app-title" content="Docker | LwhalE's blog"/><meta name="apple-mobile-web-app-status-bar-style" content="#FFB347"/><link rel="canonical" href="https://LwhalEee.github.io/2026/03/14/Docker/"/><meta name="description" content="浪费了很多时间在重新配置环境上面，我不中了 原理：理解成一个平台中搭建不同容器，执行不同进程，需要不同进程相互不可见，完全独立出去，就需要将进程隔离出去。 在Linux系统中，对一个进程进行隔离，主要是通过Namespace和Cgroup两大机制实现的。 Namespace（命名空间）机制是Linux内核提供的一种资源隔离技术，它将全局系统资源（如进程ID、网络、挂载点）划分成多个独立的空间...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker | LwhalE&#39;s blog">
+<meta property="og:url" content="https://lwhaleee.github.io/2026/03/14/Docker/index.html">
+<meta property="og:site_name" content="LwhalE&#39;s blog">
+<meta property="og:description" content="浪费了很多时间在重新配置环境上面，我不中了 原理：理解成一个平台中搭建不同容器，执行不同进程，需要不同进程相互不可见，完全独立出去，就需要将进程隔离出去。 在Linux系统中，对一个进程进行隔离，主要是通过Namespace和Cgroup两大机制实现的。 Namespace（命名空间）机制是Linux内核提供的一种资源隔离技术，它将全局系统资源（如进程ID、网络、挂载点）划分成多个独立的空间...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lwhaleee.github.io/images/Hexo-Theme-MEOW.png">
+<meta property="article:published_time" content="2026-03-14T09:07:00.000Z">
+<meta property="article:modified_time" content="2026-03-14T11:47:36.817Z">
+<meta property="article:author" content="LwhalE">
+<meta property="article:tag" content="web">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lwhaleee.github.io/images/Hexo-Theme-MEOW.png"><meta name="robots" content="index,follow"/><meta name="googlebot" content="index,follow"/><meta name="revisit-after" content="1 days"/><title>Docker | LwhalE's blog</title><link rel="shortcut icon" href="/images/Hexo-Theme-MEOW.ico"><link rel="preconnect" href="/assets"/><link rel="preconnect" href="assets"/>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="prefetch" href="/"/><link rel="prefetch" href="/archives"/><link rel="prefetch" href="/tags"/><meta name="generator" content="Hexo 8.1.1"></head><body bg-style="none"><header><div id="navbar"><div id="nav-info"><a id="site-icon" href="/" title="主页"><img src="/images/Hexo-Theme-MEOW.png" alt="Logo"/></a><a id="site-name" href="/" title="主页"><div>LwhalE's blog</div><img src="/assets/images/svg/uc/uc-home.svg" class="icon noview" alt="Icon"></a></div><div id="nav-menu"><div class="menu-item"><a href="/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>首页</span></a></div><div class="menu-item"><a href="/archives"><img src="/assets/images/svg/uc/uc-archive.svg" class="icon noview" alt="Icon"><span>归档</span></a></div><div class="menu-item"><a href="/categories"><img src="/assets/images/svg/uc/uc-category.svg" class="icon noview" alt="Icon"><span>分类</span></a></div><div class="menu-item"><a href="/tags"><img src="/assets/images/svg/uc/uc-tag.svg" class="icon noview" alt="Icon"><span>标签</span></a></div><div class="menu-item"><a href="/about"><img src="/assets/images/svg/uc/uc-about.svg" class="icon noview" alt="Icon"><span>关于</span></a></div></div><div id="nav-function"><div id="menu-btn"><a href="javascript:void(0);" title="打开菜单"><img src="/assets/images/svg/uc/uc-menu.svg" class="icon noview" alt="Icon"></a></div></div></div></header><div id="menu-aside"><div id="menu-aside-container"><div id="menu-aside-info"><a href="/" title="主页"><img src="/images/Hexo-Theme-MEOW.png" alt="Logo"/></a><a href="/" title="主页">LwhalE's blog</a></div><div class="menu-aside-item"><a href="/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>首页</span></a></div><div class="menu-aside-item"><a href="/archives"><img src="/assets/images/svg/uc/uc-archive.svg" class="icon noview" alt="Icon"><span>归档</span></a></div><div class="menu-aside-item"><a href="/categories"><img src="/assets/images/svg/uc/uc-category.svg" class="icon noview" alt="Icon"><span>分类</span></a></div><div class="menu-aside-item"><a href="/tags"><img src="/assets/images/svg/uc/uc-tag.svg" class="icon noview" alt="Icon"><span>标签</span></a></div><div class="menu-aside-item"><a href="/about"><img src="/assets/images/svg/uc/uc-about.svg" class="icon noview" alt="Icon"><span>关于</span></a></div><hr/></div></div><main><div class="banner"><div class="banner-info"><div class="banner-avatar"><img src="/images/Hexo-Theme-MEOW.png" alt="Avatar"/></div><div class="banner-title">「 Lwhale's Blog 」</div></div></div><div class="post-container"><div class="post-main"><div class="post-content"><h1 class="post-title">Docker</h1><div class="post-author"><span>作者: LwhalE</span></div><div class="post-meta"><div class="post-info"><div class="post-date"><div class="post-pubdate"><img src="/assets/images/svg/ta/ta-pubdate.svg" class="icon noview" alt="Icon"><span>发表于2026-03-14</span></div><div class="post-update"><img src="/assets/images/svg/ta/ta-update.svg" class="icon noview" alt="Icon"><span>更新于2026-03-14</span></div></div><div class="post-read"></div></div><div class="post-attribute"><div class="post-categories"><img src="/assets/images/svg/ta/ta-category.svg" class="icon noview" alt="Icon"><span><a class="post-categories-link" href="/categories/learning/">learning</a></span></div><div class="post-tags"><img src="/assets/images/svg/ta/ta-tag.svg" class="icon noview" alt="Icon"><span><a class="post-tags-link" href="/tags/web/" rel="tag">web</a></span></div></div></div><div class="post markdown" indent="false"><p>浪费了很多时间在重新配置环境上面，我不中了</p>
+<h2 id="原理："><a href="#原理：" class="headerlink" title="原理："></a>原理：</h2><p>理解成一个平台中搭建不同容器，执行不同进程，需要不同进程相互不可见，完全独立出去，就需要将进程隔离出去。</p>
+<p>在Linux系统中，对一个进程进行隔离，主要是通过Namespace和Cgroup两大机制实现的。</p>
+<p>Namespace（命名空间）机制是Linux内核提供的一种资源隔离技术，它将全局系统资源（如进程ID、网络、挂载点）划分成多个独立的空间，使不同进程组感觉拥有独立的操作系统视图。</p>
+<ul>
+<li>Mount (挂载) (CLONE_NEWNS): 隔离文件系统挂载点，使进程拥有独立的挂载视图。</li>
+<li>UTS (Unix Timesharing System) (CLONE_NEWUTS): 隔离主机名和域名。</li>
+<li>IPC (Interprocess Communication) (CLONE_NEWIPC): 隔离进程间通信资源（如消息队列、信号量）。</li>
+<li>PID (Process ID) (CLONE_NEWPID): 隔离进程ID，不同命名空间可有相同的PID（例如每个容器内都有1号进程）。</li>
+<li>Network (网络) (CLONE_NEWNET): 隔离网络设备、IP地址、端口和路由表。</li>
+<li>User (用户) (CLONE_NEWUSER): 隔离用户和组ID，可实现容器内root用户映射为宿主机上的非特权用户。</li>
+</ul>
+<p>Cgroup (Control Groups) 是 Linux 内核的一项功能，用于对进程组进行物理资源（CPU、内存、磁盘 I&#x2F;O、网络）的限制、控制和隔离。</p>
+<p>在 Linux 中，<code>#</code> 符号就代表当前是 root 用户，而 <code>$</code> 才代表普通用户</p>
+<p>一个容器进程本质上是一个运行在沙盒中的隔离进程，由Linux系统本身负责隔离，Docker只是提供了一系列工具，帮助我们设置好隔离环境后，启动这个进程。</p>
+<ul>
+<li><h3 id="三层隔离"><a href="#三层隔离" class="headerlink" title="三层隔离"></a>三层隔离</h3></li>
+</ul>
+<p>最基本的隔离就是进程之间看不到彼此，这是由Linux的Namespace机制实现的。进程隔离的结果就是以隔离方式启动的进程看到的自身进程ID总是1，且看不到系统的其他进程。</p>
+<p>第二种隔离就是隔离系统真实的文件系统。Docker利用Linux的mount机制，给每个隔离进程挂载了一个虚拟的文件系统，使得一个隔离进程只能访问这个虚拟的文件系统，无法看到系统真实的文件系统。相当于就是一个去获取一个真实文件（实际文件被隔离出去），投射到一个虚拟文件系统里。再把投射的这个虚拟文件和需要用到的第三方库或者需要使其中程序正常进行，其他的配置系统一起打包成为一个<code>Dockerfile</code>，再把<code>Dockerfile</code>和Docker运行的依赖打包就成为Docker镜像。启动进程的时候就相当于逐层解压，最后成为一个虚拟的文件系统。</p>
+<p>第三种隔离就是网络协议栈的隔离</p>
+<p>Redis（Remote Dictionary Server）是一个开源的内存数据库，遵守 BSD 协议，它提供了一个高性能的键值（key-value）存储系统，常用于缓存、消息队列、会话存储等应用场景。</p>
+<p>在Docker中运行一个Redis，用宿主机去连接Redis，这里Redis的监听相当于也是发生在Docker内部。由于Linux的网络隔离，Redis进程拥有与宿主机不同的网络空间，所以需要把Redis进程的端口号映射到宿主机</p>
+<p>如果同时运行相当于两个进程的话，通过将不同进程服务名称也解析为动态分配的IP地址，相当于是同一IP下的不同端口的分配的不同活动</p>
+<p>表面上看上去一致的内容，类似于不同进程看本身的ID都是1，表现的就是无法直接从IP地址上去区别实际内容。</p>
+<p>Docker Compose 是一个用于定义和运行多容器 Docker 应用的官方工具。它使用 YAML 文件（<code>docker-compose.yml</code>）配置多个容器服务、网络和数据卷，通过 docker-compose up 一键启动、停止和管理整个应用堆栈，特别适用于开发、测试和单机生产环境的复杂应用编排。</p>
+<h2 id="解决镜像拉取问题的方案："><a href="#解决镜像拉取问题的方案：" class="headerlink" title="解决镜像拉取问题的方案："></a>解决镜像拉取问题的方案：</h2><p>配置镜像加速器<br>这是最标准、最持久有效的方案。通过修改Docker守护进程的配置文件，为所有镜像拉取请求指定一个高速缓存代理 。</p>
+<p>但是我在搭这个环境的时候，不知道什么原因，配置加速器反而拉取失败了，感觉可能是连接问题，好吧我在配代理的时候也遇到了这个问题，现在串起来了好家伙</p>
+<p>编辑（或创建）Docker的配置文件 <code>sudo vi /etc/docker/daemon.json</code>。</p>
+<p>输入以下内容（可配置多个加速地址以实现负载均衡）：</p>
+<div class="code-container" code-lang="Json"><div class="codebox"><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;registry-mirrors&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="string">&quot;https://docker.mirrors.sjtug.sjtu.edu.cn&quot;</span><span class="punctuation">,</span>  <span class="comment">// 上海交通大学镜像站</span></span><br><span class="line">    <span class="string">&quot;https://mirror.baidubce.com&quot;</span><span class="punctuation">,</span>              <span class="comment">// 百度云镜像站</span></span><br><span class="line">    <span class="string">&quot;https://hub-mirror.c.163.com&quot;</span>               <span class="comment">// 网易镜像站</span></span><br><span class="line">  <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure><div class="code-fold" title="Fold/Open"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 9l6 6l6 -6" /></svg></div><div class="code-copy" title="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"  stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z" /><path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" /></svg></div></div></div>
+
+<p>重启Docker服务使配置生效：<code>sudo systemctl daemon-reload &amp;&amp; sudo systemctl restart docker</code>。</p>
+<p>验证配置：<code>docker info | grep &quot;Registry Mirrors&quot; -A 1</code>，看到配置的地址列表即表示成功 。</p>
+<p>让科学上网方法生效<br>科学上网工具可以让Docker守护进程的请求通过代理发送。为Docker服务设置HTTP&#x2F;HTTPS代理。</p>
+<p>操作步骤：</p>
+<ul>
+<li><p>为Docker服务创建独立的配置目录：<code>sudo mkdir -p /etc/systemd/system/docker.service.d</code></p>
+</li>
+<li><p>创建配置文件：<code>sudo vi /etc/systemd/system/docker.service.d/http-proxy.conf</code></p>
+</li>
+<li><p>填入代理地址（假设宿主机代理端口是<code>1080</code>，且Docker守护进程有权限访问）：</p>
+<div class="code-container" code-lang="Ini"><div class="codebox"><figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[Service]</span></span><br><span class="line"><span class="attr">Environment</span>=<span class="string">&quot;HTTP_PROXY=http://宿主机IP:1080&quot;</span></span><br><span class="line"><span class="attr">Environment</span>=<span class="string">&quot;HTTPS_PROXY=http://宿主机IP:1080&quot;</span></span><br><span class="line"><span class="attr">Environment</span>=<span class="string">&quot;NO_PROXY=localhost,127.0.0.1,.local&quot;</span></span><br></pre></td></tr></table></figure><div class="code-fold" title="Fold/Open"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 9l6 6l6 -6" /></svg></div><div class="code-copy" title="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"  stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z" /><path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" /></svg></div></div></div>
+</li>
+<li><p>重新加载配置并重启：<code>sudo systemctl daemon-reload &amp;&amp; sudo systemctl restart docker</code> 。</p>
+</li>
+</ul>
+<h2 id="Dockerfile"><a href="#Dockerfile" class="headerlink" title="Dockerfile"></a><code>Dockerfile</code></h2><p><code>Dockerfile</code>举例</p>
+<div class="code-container" code-lang="Dockerfile"><div class="codebox"><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> php:<span class="number">7.4</span>-apache</span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> src/ /var/www/html/</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> flag /flag</span></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"> /var/www/html</span></span><br><span class="line"><span class="keyword">ENV</span> FLAG=flag&#123;Th1s_is_a_fake_flag&#125;</span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> <span class="built_in">chmod</span> 444 /flag</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> a2enmod rewrite</span></span><br><span class="line"><span class="keyword">EXPOSE</span> <span class="number">80</span></span><br><span class="line"><span class="keyword">CMD</span><span class="language-bash"> [<span class="string">&quot;apache2-foreground&quot;</span>]</span></span><br></pre></td></tr></table></figure><div class="code-fold" title="Fold/Open"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 9l6 6l6 -6" /></svg></div><div class="code-copy" title="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"  stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z" /><path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" /></svg></div></div></div>
+
+<p>其中</p>
+<ul>
+<li><code>FROM php:7.4-apache</code>指定基础镜像，这个镜像Apache 已安装并配置好，PHP 已与 Apache 集成，默认网站目录：<code>/var/www/html</code> 一步到位。</li>
+<li><code>COPY src/ /var/www/html/</code>把本地源码拷贝进容器。宿主机当前目录下的 <code>src</code> 文件夹内容，复制到容器的 <code>/var/www/html/</code>(网页根目录)</li>
+<li>这样访问<code>http://ip:port/index.php</code>就可以执行源码。如果有多个文件，都可以访问<code>http://ip:port/phpinfo.php</code></li>
+<li><code>COPY flag /flag</code>把宿主机当前目录下的 <code>flag</code> 文件，复制到容器根目录 <code>/flag</code></li>
+<li><code>RUN chmod 444 /flag</code> 设置 flag 文件权限为“只读” <code>444 = r-- r-- r--</code>也可以设置为<code>400</code>只允许root读，这样就不得不提权了。</li>
+<li><code>RUN a2enmod rewrite</code> 启用 Apache 的 rewrite 重写模块，实现伪静态 URL，路由转发，访问控制。（这个不是每道题都要用，但还是写上）</li>
+<li><code>ENV FLAG=flag{Th1s_is_a_fake_flag}</code>添加环境变量。</li>
+<li><code>EXPOSE 80</code> 声明容器对外暴露 80 端口</li>
+<li><code>WORKDIR /var/www/html</code>设置工作目录</li>
+<li><code>CMD [&quot;apache2-foreground&quot;]</code>默认启动<code>apache</code></li>
+</ul>
+<p>docker的相关命令：</p>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th>命令</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>docker pull &lt;镜像名&gt;:&lt;标签&gt;</code></td>
+<td>从仓库拉取镜像，如 <code>docker pull ubuntu:22.04</code></td>
+</tr>
+<tr>
+<td><code>docker images</code></td>
+<td>列出本地所有镜像</td>
+</tr>
+<tr>
+<td><code>docker rmi &lt;镜像ID或名称&gt;</code></td>
+<td>删除本地一个或多个镜像</td>
+</tr>
+<tr>
+<td><code>docker build -t &lt;镜像名&gt;:&lt;标签&gt; .</code></td>
+<td>根据当前目录下的 <code>Dockerfile</code> 构建镜像</td>
+</tr>
+<tr>
+<td><code>docker tag &lt;源镜像&gt; &lt;目标镜像:标签&gt;</code></td>
+<td>给镜像打标签，常用于推送前重命名</td>
+</tr>
+<tr>
+<td><code>docker push &lt;镜像名&gt;:&lt;标签&gt;</code></td>
+<td>将镜像推送到远程仓库（需先登录）</td>
+</tr>
+<tr>
+<td><code>docker search &lt;关键词&gt;</code></td>
+<td>在 Docker Hub 上搜索镜像</td>
+</tr>
+<tr>
+<td><code>docker run [选项] &lt;镜像&gt; [命令]</code></td>
+<td>创建并启动一个新容器（最常用，选项如 <code>-d</code> 后台、<code>-it</code> 交互、<code>--name</code> 命名、<code>-p</code> 端口映射、<code>-v</code> 挂载）</td>
+</tr>
+<tr>
+<td><code>docker ps</code></td>
+<td>列出正在运行的容器（加 <code>-a</code> 列出所有容器，包括已停止的）</td>
+</tr>
+<tr>
+<td><code>docker stop &lt;容器ID或名称&gt;</code></td>
+<td>停止一个运行中的容器</td>
+</tr>
+<tr>
+<td><code>docker start &lt;容器ID或名称&gt;</code></td>
+<td>启动一个已停止的容器</td>
+</tr>
+<tr>
+<td><code>docker restart &lt;容器ID或名称&gt;</code></td>
+<td>重启容器</td>
+</tr>
+<tr>
+<td><code>docker rm &lt;容器ID或名称&gt;</code></td>
+<td>删除一个或多个已停止的容器（加 <code>-f</code> 强制删除运行中的）</td>
+</tr>
+<tr>
+<td><code>docker logs &lt;容器ID或名称&gt;</code></td>
+<td>查看容器的日志输出（加 <code>-f</code> 持续跟踪）</td>
+</tr>
+<tr>
+<td><code>docker exec -it &lt;容器ID或名称&gt; &lt;命令&gt;</code></td>
+<td>在运行中的容器内执行命令（例如 <code>docker exec -it mycontainer bash</code> 进入容器终端）</td>
+</tr>
+<tr>
+<td><code>docker inspect &lt;容器ID或名称&gt;</code></td>
+<td>查看容器的详细信息（JSON 格式）</td>
+</tr>
+<tr>
+<td><code>docker version</code></td>
+<td>显示 Docker 客户端和服务端版本信息</td>
+</tr>
+<tr>
+<td><code>docker info</code></td>
+<td>显示 Docker 系统信息（容器数、镜像数、存储驱动等）</td>
+</tr>
+<tr>
+<td><code>docker system df</code></td>
+<td>查看镜像、容器、卷所占用的磁盘空间</td>
+</tr>
+<tr>
+<td><code>docker system prune</code></td>
+<td>清理不再使用的资源（容器、网络、镜像、构建缓存），加 <code>-a</code> 清理更彻底</td>
+</tr>
+<tr>
+<td><code>docker network ls</code></td>
+<td>列出所有网络</td>
+</tr>
+<tr>
+<td><code>docker network create &lt;网络名&gt;</code></td>
+<td>创建一个新的桥接网络</td>
+</tr>
+<tr>
+<td><code>docker network connect &lt;网络名&gt; &lt;容器&gt;</code></td>
+<td>将容器连接到指定网络</td>
+</tr>
+<tr>
+<td><code>docker network disconnect &lt;网络名&gt; &lt;容器&gt;</code></td>
+<td>将容器从网络断开</td>
+</tr>
+<tr>
+<td><code>docker network inspect &lt;网络名&gt;</code></td>
+<td>查看网络的详细信息</td>
+</tr>
+<tr>
+<td><code>docker volume ls</code></td>
+<td>列出所有卷</td>
+</tr>
+<tr>
+<td><code>docker volume create &lt;卷名&gt;</code></td>
+<td>创建一个数据卷</td>
+</tr>
+<tr>
+<td><code>docker volume inspect &lt;卷名&gt;</code></td>
+<td>查看卷的详细信息</td>
+</tr>
+<tr>
+<td><code>docker volume rm &lt;卷名&gt;</code></td>
+<td>删除一个卷</td>
+</tr>
+<tr>
+<td><code>docker volume prune</code></td>
+<td>删除所有未使用的卷</td>
+</tr>
+<tr>
+<td><code>docker cp &lt;源路径&gt; &lt;容器:目标路径&gt;</code></td>
+<td>在宿主机和容器之间复制文件&#x2F;目录</td>
+</tr>
+<tr>
+<td><code>docker commit &lt;容器&gt; &lt;镜像名:标签&gt;</code></td>
+<td>将容器的当前状态保存为新镜像</td>
+</tr>
+<tr>
+<td><code>docker export &lt;容器&gt; -o 文件名.tar</code></td>
+<td>将容器的文件系统导出为 tar 包</td>
+</tr>
+<tr>
+<td><code>docker import 文件名.tar &lt;镜像名:标签&gt;</code></td>
+<td>从 tar 包导入镜像</td>
+</tr>
+<tr>
+<td><code>docker save &lt;镜像&gt; -o 文件名.tar</code></td>
+<td>将一个或多个镜像保存为 tar 包</td>
+</tr>
+<tr>
+<td><code>docker load -i 文件名.tar</code></td>
+<td>从 tar 包加载镜像</td>
+</tr>
+<tr>
+<td><code>docker login</code></td>
+<td>登录 Docker Hub 或其他私有仓库</td>
+</tr>
+<tr>
+<td><code>docker logout</code></td>
+<td>登出仓库</td>
+</tr>
+</tbody></table></div>
+<h3 id=""><a href="#" class="headerlink" title=""></a></h3><p>比如docker run -d，运行容器，如果没有对应容器就会创建之后再运行</p>
+<p>可以用<code>docker exec -it pear_test bash</code>可以在控制台进入容器，方便调试。</p>
+<p>创建成功之后，返回的字符就是容器id</p>
+<p>拿之前挂载靶场文件使用的命令举例</p>
+<ul>
+<li><strong><code>docker run</code></strong><br>Docker 的核心命令，用于基于指定镜像创建并运行一个新容器。</li>
+<li><strong><code>-d</code></strong><br>后台运行容器（detach 模式），容器启动后不会占用当前终端，而是在后台运行。</li>
+<li><strong><code>--name lfi-lab</code></strong><br>为容器指定一个名称 <code>lfi-lab</code>，方便后续通过该名称管理容器（如停止、查看日志等），若不指定则 Docker 会随机生成一个名称。</li>
+<li><strong><code>-p 8082:80</code></strong><br>端口映射，将宿主机的 <code>8082</code> 端口映射到容器的 <code>80</code> 端口。这样访问宿主机 <code>http://localhost:8082</code> 即可访问容器内运行的 Web 服务（容器内 Apache 默认监听 80 端口）。</li>
+<li><strong><code>-v &quot;D:\phpstudy_pro\WWW\lfi-labs-master:/var/www/html&quot;</code></strong><br>卷挂载（volume mount），将宿主机上的目录 <code>D:\phpstudy_pro\WWW\lfi-labs-master</code> 挂载到容器内的 <code>/var/www/html</code> 目录。<ul>
+<li><code>/var/www/html</code> 是 Apache 的默认 Web 根目录。</li>
+<li>这样做可以将本地的 PHP 项目代码直接同步到容器中，方便开发调试或运行特定应用（如 LFI 测试靶场），且代码在宿主机上修改后会实时反映在容器内。</li>
+</ul>
+</li>
+<li><strong><code>php:7.3-apache</code></strong><br>指定使用的 Docker 镜像，这里是一个预装了 PHP 7.3 和 Apache 的官方镜像。容器将以此镜像为基础运行。</li>
+</ul>
+<h2 id="复制文件时关于忽略部分文件的方式："><a href="#复制文件时关于忽略部分文件的方式：" class="headerlink" title="复制文件时关于忽略部分文件的方式："></a>复制文件时关于忽略部分文件的方式：</h2><p>解决方案是使用 <code>.dockerignore</code> 文件，它的工作原理类似于<code>.gitignore</code> 。</p>
+<p><code>.gitignore </code>文件用于定义 Git 项目中无需追踪和提交的文件或目录（如日志、编译产物、IDE 配置）。在仓库根目录创建该文件，按行写入匹配模式（支持通配符），即可实现忽略。已提交的文件需用 git rm –cached 移除追踪。</p>
+<ul>
+<li>在执行<code>docker build</code>命令的目录下（也就是构建上下文的根目录），创建一个名为 <code>.dockerignore</code> 的文件。</li>
+</ul>
+<div class="code-container" code-lang="Plaintext"><div class="codebox"><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"># .dockerignore 示例（注释用 # 开头） </span><br><span class="line"># 忽略 node_modules 目录（整目录） </span><br><span class="line">node_modules/ </span><br><span class="line"># 忽略 logs 目录 </span><br><span class="line">logs/ </span><br><span class="line"># 忽略 .git 版本控制目录 </span><br><span class="line">.git/ </span><br><span class="line"># 忽略单个文件 </span><br><span class="line">.env </span><br><span class="line">temp.txt </span><br><span class="line"># 忽略所有 .log 后缀的文件 </span><br><span class="line">*.log </span><br><span class="line"># 忽略所有以 temp 开头的文件/目录 </span><br><span class="line">temp* </span><br><span class="line"># 例外：如果想忽略所有 .txt 但保留 important.txt </span><br><span class="line">*.txt </span><br><span class="line">!important.txt</span><br></pre></td></tr></table></figure><div class="code-fold" title="Fold/Open"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 9l6 6l6 -6" /></svg></div><div class="code-copy" title="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"  stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z" /><path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" /></svg></div></div></div>
+
+<p>当执行 <code>COPY . /app</code> 时，Docker 会先读取 <code>.dockerignore</code> 中的规则，自动过滤掉这些文件，只复制不没有包含在这些文件中的内容。</p>
+<h2 id="Docker-compose-yml或Docker-compose-yaml文件"><a href="#Docker-compose-yml或Docker-compose-yaml文件" class="headerlink" title="Docker-compose.yml或Docker-compose.yaml文件"></a><code>Docker-compose.yml</code>或<code>Docker-compose.yaml</code>文件</h2><p><code>Dockerfile</code>只可以用来构建单个镜像，在<code>docker-compose.yml</code>文件中，可以定义多个服务，每个服务可以包含一系列配置选项，例如镜像名称、容器端口、环境变量等。</p>
+<div class="code-container" code-lang="Yaml"><div class="codebox"><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 指定 compose 文件版本（推荐用 3.x，兼容性最好）</span></span><br><span class="line"><span class="attr">version:</span> <span class="string">&#x27;3.8&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义所有服务（每个服务对应一个容器）</span></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="comment"># 服务名称（自定义，比如叫 my-app）</span></span><br><span class="line">  <span class="string">服务名:</span></span><br><span class="line">    <span class="comment"># 【核心】自动构建镜像的配置</span></span><br><span class="line">    <span class="attr">build:</span></span><br><span class="line">      <span class="attr">context:</span> <span class="string">.</span>          <span class="comment"># 构建上下文（Dockerfile 所在目录，. 表示当前目录）</span></span><br><span class="line">      <span class="attr">dockerfile:</span> <span class="string">Dockerfile</span>  <span class="comment"># 指定 Dockerfile 文件名（默认就是 Dockerfile，可省略）</span></span><br><span class="line">    <span class="comment"># 【核心】端口映射（替代 docker run -p）</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;主机端口1:容器端口1&quot;</span>  <span class="comment"># 比如 &quot;8080:80&quot;</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;主机端口2:容器端口2&quot;</span>  <span class="comment"># 可选，支持多端口映射</span></span><br><span class="line">    <span class="comment"># 可选：给容器自定义名称（替代 docker run --name）</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">自定义容器名</span></span><br><span class="line">    <span class="comment"># 可选：容器后台运行（默认就是，对应 docker run -d）</span></span><br><span class="line">    <span class="attr">restart:</span> <span class="string">always</span>  <span class="comment"># 容器退出时自动重启（可选，推荐加）</span></span><br></pre></td></tr></table></figure><div class="code-fold" title="Fold/Open"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 9l6 6l6 -6" /></svg></div><div class="code-copy" title="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"  stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z" /><path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" /></svg></div></div></div>
+
+<p>一个依赖Redis数据库的web应用</p>
+<div class="code-container" code-lang="Yaml"><div class="codebox"><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">&#x27;3.8&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="comment"># Web 应用服务</span></span><br><span class="line">  <span class="attr">web:</span></span><br><span class="line">    <span class="comment"># 使用当前目录下的 Dockerfile 进行构建</span></span><br><span class="line">    <span class="attr">build:</span> <span class="string">.</span></span><br><span class="line">    <span class="comment"># 端口映射：将宿主机的8000端口映射到容器的8000端口</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;8000:8000&quot;</span></span><br><span class="line">    <span class="comment"># 环境变量：告诉web应用，redis服务的主机名是&quot;redis&quot;（服务名）</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">REDIS_HOST=redis</span></span><br><span class="line">    <span class="comment"># 依赖关系：确保redis服务先于web服务启动</span></span><br><span class="line">    <span class="attr">depends_on:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">redis</span></span><br><span class="line">    <span class="comment"># 卷挂载：将当前代码挂载进去，方便开发时热更新</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">.:/app</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># Redis 数据库服务</span></span><br><span class="line">  <span class="attr">redis:</span></span><br><span class="line">    <span class="comment"># 直接使用官方镜像</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">&quot;redis:alpine&quot;</span></span><br><span class="line">    <span class="comment"># 没有暴露端口到宿主机，仅供内部网络访问</span></span><br></pre></td></tr></table></figure><div class="code-fold" title="Fold/Open"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 9l6 6l6 -6" /></svg></div><div class="code-copy" title="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"  stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z" /><path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" /></svg></div></div></div>
+
+<ul>
+<li><strong>web 服务</strong>：基于当前目录下的 <code>Dockerfile</code> 构建一个 Web 应用镜像，并将容器内的 8000 端口映射到宿主机的 8000 端口。通过环境变量 <code>REDIS_HOST=redis</code> 告诉 Web 应用如何连接到 Redis（服务名 <code>redis</code> 在 Docker Compose 内部网络中会自动解析为对应容器的 IP）。它还设置了容器启动顺序依赖（<code>depends_on</code>），确保 Redis 服务先启动。另外通过卷挂载将当前代码目录挂载到容器的 <code>/app</code>，便于开发时实时更新代码。</li>
+<li><strong>redis 服务</strong>：使用官方的 <code>redis:alpine</code> 镜像，没有向宿主机暴露端口，仅供内部网络中的 Web 服务访问。</li>
+</ul>
+</div><div class="post-reward"><div class="post-reward-btn" title="赞赏作者"><img src="/assets/images/svg/uc/uc-gift.svg" class="icon noview" alt="Icon"><span></span></div><div class="post-reward-content"><div class="post-reward-text"></div><div class="post-reward-list"><a href="/null" target="_blank">致谢名单</a></div></div></div><div class="post-copyright"><div class="post-copyright-info">本作品由 LwhalE 于 2026-03-14 17:07:00 发布</div><div class="post-copyright-link"><span>作品地址：<a href="https://lwhaleee.github.io/2026/03/14/Docker/">Docker</a></span><button class="copy-text" type="button" data-text="https://lwhaleee.github.io/2026/03/14/Docker/">复制</button></div><div class="post-copyright-detail">除特别声明外，本站作品均采用 <a href='https://creativecommons.org/licenses/by-nc-sa/4.0/' title='Attribution-NonCommercial-ShareAlike' target='_blank'>CC BY-NC-SA 4.0</a> 许可协议，转载请注明来自 <a href='/'>LwhalE's blog</a></div><img class="post-copyright-icon noview" src="/images/Hexo-Theme-MEOW.png" alt="Logo"/></div><div class="post-tail-tags"><a class="post-tail-tags-link" href="/tags/web/" rel="tag">web</a></div></div><aside id="post-sidebar" status="show"><div id="toc-container"><div class="toc-title"><img src="/assets/images/svg/ta/ta-toc.svg" class="icon noview" alt="Icon"><span>目录</span></div><div class="toc-content" id="toc-div"><ol class="toc-list"><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#%E5%8E%9F%E7%90%86%EF%BC%9A"><span class="toc-list-text">原理：</span></a><ol class="toc-list-child"><li class="toc-list-item toc-list-level-3"><a class="toc-list-link" href="#%E4%B8%89%E5%B1%82%E9%9A%94%E7%A6%BB"><span class="toc-list-text">三层隔离</span></a></li></ol></li><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#%E8%A7%A3%E5%86%B3%E9%95%9C%E5%83%8F%E6%8B%89%E5%8F%96%E9%97%AE%E9%A2%98%E7%9A%84%E6%96%B9%E6%A1%88%EF%BC%9A"><span class="toc-list-text">解决镜像拉取问题的方案：</span></a></li><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#Dockerfile"><span class="toc-list-text">Dockerfile</span></a><ol class="toc-list-child"><li class="toc-list-item toc-list-level-3"><a class="toc-list-link"><span class="toc-list-text"></span></a></li></ol></li><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#%E5%A4%8D%E5%88%B6%E6%96%87%E4%BB%B6%E6%97%B6%E5%85%B3%E4%BA%8E%E5%BF%BD%E7%95%A5%E9%83%A8%E5%88%86%E6%96%87%E4%BB%B6%E7%9A%84%E6%96%B9%E5%BC%8F%EF%BC%9A"><span class="toc-list-text">复制文件时关于忽略部分文件的方式：</span></a></li><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#Docker-compose-yml%E6%88%96Docker-compose-yaml%E6%96%87%E4%BB%B6"><span class="toc-list-text">Docker-compose.yml或Docker-compose.yaml文件</span></a></li></ol></div></div></aside></div></div><div id="toolbar" hide=""><div id="toolbar-setting-container" hide=""><div class="toolbar-item"><button id="tool-color-mode" title="深色模式" type="button"><img src="/assets/images/svg/ta/ta-moon.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button class="copy-text" id="tool-share" title="分享" type="button" data-text="https://lwhaleee.github.io/2026/03/14/Docker/"><img src="/assets/images/svg/ta/ta-share.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-font-size-plus" title="放大字体" type="button"><img src="/assets/images/svg/ta/ta-text-plus.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-font-size-minus" title="缩小字体" type="button"><img src="/assets/images/svg/ta/ta-text-minus.svg" class="icon noview" alt="Icon"></button></div></div><div class="toolbar-container"><div class="toolbar-item"><button id="tool-setting" title="设置" type="button"><img src="/assets/images/svg/ta/ta-setting.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-toc" title="目录" type="button"><img src="/assets/images/svg/ta/ta-toc.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-gototop" title="返回顶部" type="button"><img src="/assets/images/svg/ta/ta-up.svg" class="icon noview" alt="Icon"></button></div></div></div></main><footer><div class="footer"><div id="footer-copyright">© 2026 <span>💗</span> <a href="/null">LwhalE</a></div><div id="footer-info"><div id="footer-framework">🚀本站由 <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/chanwj/hexo-theme-meow" title="3.2.0" target="_blank">Meow</a> 强力驱动</div><div id="footer-runtime"><span id="runtime" data-startdate="2026-01-10T22:00:00.000Z">🌻已稳定运行.年.月.天</span></div></div></div></footer><div class="scripts"><script>const GLOBALCONFIG = {
+  root: '/',
+  toolbar: true,
+  lazyload_src: '/assets/images/Meow-Loading.webp',
+  friends: false,
+  codeblock: true,
+  share_text: '🐱Share From Meow',
+  onblur_title: 'Please Come Back～✧(´▽`ʃ♡ƪ)',
+  mouse_click: false,
+  notify:{
+    enable: false,
+    info: '复制成功～转载请标注本文地址',
+    f12_info: '开发者模式已打开，请遵循本站版权协议'
+  },
+  search: {
+    enable: false,
+    path: '',
+    local: {
+      top_n_per_article: 1,
+      preload: false
+    }
+  },
+  encrypt: false,
+};
+</script><script>if (!localStorage.getItem('color-mode')) {
+  localStorage.setItem('color-mode', 'light' || 'light');
+}
+document.body.setAttribute('data-mode', localStorage.getItem('color-mode'));
+</script>
+<script src="/js/theme/tools/utils.js"></script>
+
+<script src="/js/plugins/dist/lazyload.min.js"></script>
+
+<script src="/js/plugins/view-image.min.js"></script>
+<script>if (localStorage.getItem('font-size')) {
+  document.querySelector('.post').style.fontSize = localStorage.getItem('font-size') + 'px';
+}
+</script>
+<script src="/js/main.js" type="module"></script>
+</div></body></html>

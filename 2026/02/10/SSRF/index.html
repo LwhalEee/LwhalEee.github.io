@@ -1,18 +1,244 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="author" content="LwhalE"/><meta name="copyright" content="LwhalE"/><meta name="theme-color" content="#FFB347"/><meta name="format-detection" content="telephone=no"/><meta name="keywords" content="Hexo Theme MEOW"/><meta name="mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-capable" content="yes"/><meta name="apple-touch-fullscreen" content="yes"/><meta name="application-name" content="SSRF | LwhalE's blog"/><meta name="apple-mobile-web-app-title" content="SSRF | LwhalE's blog"/><meta name="apple-mobile-web-app-status-bar-style" content="#FFB347"/><link rel="canonical" href="https://LwhalEee.github.io/2026/02/10/SSRF/"/><meta name="description" content="Hexo Theme MEOW">
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="author" content="LwhalE"/><meta name="copyright" content="LwhalE"/><meta name="theme-color" content="#FFB347"/><meta name="format-detection" content="telephone=no"/><meta name="keywords" content="web"/><meta name="mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-capable" content="yes"/><meta name="apple-touch-fullscreen" content="yes"/><meta name="application-name" content="SSRF | LwhalE's blog"/><meta name="apple-mobile-web-app-title" content="SSRF | LwhalE's blog"/><meta name="apple-mobile-web-app-status-bar-style" content="#FFB347"/><link rel="canonical" href="https://LwhalEee.github.io/2026/02/10/SSRF/"/><meta name="description" content="在之前学习文件包含的时候大概看过SSRF的攻击原理，主要是一种攻击方式的表示，请求资源的时候直接去获取内网资源。因此在理解这一块的过程中，我重新理了一下IP，主机，端口，域名以及内网的存在方式和关联方式 SSRF的原理和概念SSRF是Server-side Request Forge的缩写，中文翻译为服务端请求伪造。产生的原因是由于服务端提供了从其他服务器应用获取数据的功能且没有对地址和协议...">
 <meta property="og:type" content="article">
 <meta property="og:title" content="SSRF | LwhalE&#39;s blog">
 <meta property="og:url" content="https://lwhaleee.github.io/2026/02/10/SSRF/index.html">
 <meta property="og:site_name" content="LwhalE&#39;s blog">
-<meta property="og:description" content="Hexo Theme MEOW">
+<meta property="og:description" content="在之前学习文件包含的时候大概看过SSRF的攻击原理，主要是一种攻击方式的表示，请求资源的时候直接去获取内网资源。因此在理解这一块的过程中，我重新理了一下IP，主机，端口，域名以及内网的存在方式和关联方式 SSRF的原理和概念SSRF是Server-side Request Forge的缩写，中文翻译为服务端请求伪造。产生的原因是由于服务端提供了从其他服务器应用获取数据的功能且没有对地址和协议...">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://lwhaleee.github.io/images/Hexo-Theme-MEOW.png">
 <meta property="article:published_time" content="2026-02-10T07:19:01.000Z">
-<meta property="article:modified_time" content="2026-02-10T07:19:01.401Z">
+<meta property="article:modified_time" content="2026-03-14T11:10:06.256Z">
 <meta property="article:author" content="LwhalE">
+<meta property="article:tag" content="web">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://lwhaleee.github.io/images/Hexo-Theme-MEOW.png"><meta name="robots" content="index,follow"/><meta name="googlebot" content="index,follow"/><meta name="revisit-after" content="1 days"/><title>SSRF | LwhalE's blog</title><link rel="shortcut icon" href="/images/Hexo-Theme-MEOW.ico"><link rel="preconnect" href="/assets"/><link rel="preconnect" href="assets"/>
 <link rel="stylesheet" href="/css/style.css">
-<link rel="prefetch" href="/"/><link rel="prefetch" href="/archives"/><link rel="prefetch" href="/tags"/><meta name="generator" content="Hexo 8.1.1"></head><body bg-style="none"><header><div id="navbar"><div id="nav-info"><a id="site-icon" href="/" title="主页"><img src="/images/Hexo-Theme-MEOW.png" alt="Logo"/></a><a id="site-name" href="/" title="主页"><div>LwhalE's blog</div><img src="/assets/images/svg/uc/uc-home.svg" class="icon noview" alt="Icon"></a></div><div id="nav-menu"><div class="menu-item"><a href="/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>首页</span></a></div><div class="menu-item"><a href="/archives"><img src="/assets/images/svg/uc/uc-archive.svg" class="icon noview" alt="Icon"><span>归档</span></a></div><div class="menu-item"><a href="/categories"><img src="/assets/images/svg/uc/uc-category.svg" class="icon noview" alt="Icon"><span>分类</span></a></div><div class="menu-item"><a href="/tags"><img src="/assets/images/svg/uc/uc-tag.svg" class="icon noview" alt="Icon"><span>标签</span></a></div><div class="menu-item"><a href="/about"><img src="/assets/images/svg/uc/uc-about.svg" class="icon noview" alt="Icon"><span>关于</span></a></div></div><div id="nav-function"><div id="menu-btn"><a href="javascript:void(0);" title="打开菜单"><img src="/assets/images/svg/uc/uc-menu.svg" class="icon noview" alt="Icon"></a></div></div></div></header><div id="menu-aside"><div id="menu-aside-container"><div id="menu-aside-info"><a href="/" title="主页"><img src="/images/Hexo-Theme-MEOW.png" alt="Logo"/></a><a href="/" title="主页">LwhalE's blog</a></div><div class="menu-aside-item"><a href="/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>首页</span></a></div><div class="menu-aside-item"><a href="/archives"><img src="/assets/images/svg/uc/uc-archive.svg" class="icon noview" alt="Icon"><span>归档</span></a></div><div class="menu-aside-item"><a href="/categories"><img src="/assets/images/svg/uc/uc-category.svg" class="icon noview" alt="Icon"><span>分类</span></a></div><div class="menu-aside-item"><a href="/tags"><img src="/assets/images/svg/uc/uc-tag.svg" class="icon noview" alt="Icon"><span>标签</span></a></div><div class="menu-aside-item"><a href="/about"><img src="/assets/images/svg/uc/uc-about.svg" class="icon noview" alt="Icon"><span>关于</span></a></div><hr/></div></div><main><div class="banner"><div class="banner-info"><div class="banner-avatar"><img src="/images/Hexo-Theme-MEOW.png" alt="Avatar"/></div><div class="banner-title">「 Lwhale's Blog 」</div></div></div><div class="post-container"><div class="post-main"><div class="post-content"><h1 class="post-title">SSRF</h1><div class="post-author"><span>作者: LwhalE</span></div><div class="post-meta"><div class="post-info"><div class="post-date"><div class="post-pubdate"><img src="/assets/images/svg/ta/ta-pubdate.svg" class="icon noview" alt="Icon"><span>发表于2026-02-10</span></div><div class="post-update"><img src="/assets/images/svg/ta/ta-update.svg" class="icon noview" alt="Icon"><span>更新于2026-02-10</span></div></div><div class="post-read"></div></div><div class="post-attribute"></div></div><div class="post markdown" indent="false"></div><div class="post-reward"><div class="post-reward-btn" title="赞赏作者"><img src="/assets/images/svg/uc/uc-gift.svg" class="icon noview" alt="Icon"><span></span></div><div class="post-reward-content"><div class="post-reward-text"></div><div class="post-reward-list"><a href="/null" target="_blank">致谢名单</a></div></div></div><div class="post-copyright"><div class="post-copyright-info">本作品由 LwhalE 于 2026-02-10 15:19:01 发布</div><div class="post-copyright-link"><span>作品地址：<a href="https://lwhaleee.github.io/2026/02/10/SSRF/">SSRF</a></span><button class="copy-text" type="button" data-text="https://lwhaleee.github.io/2026/02/10/SSRF/">复制</button></div><div class="post-copyright-detail">除特别声明外，本站作品均采用 <a href='https://creativecommons.org/licenses/by-nc-sa/4.0/' title='Attribution-NonCommercial-ShareAlike' target='_blank'>CC BY-NC-SA 4.0</a> 许可协议，转载请注明来自 <a href='/'>LwhalE's blog</a></div><img class="post-copyright-icon noview" src="/images/Hexo-Theme-MEOW.png" alt="Logo"/></div><div class="post-tail-tags"></div></div><aside id="post-sidebar" status="show"><div id="toc-container"><div class="toc-title"><img src="/assets/images/svg/ta/ta-toc.svg" class="icon noview" alt="Icon"><span>目录</span></div><div class="toc-content" id="toc-div"></div></div></aside></div></div><div id="toolbar" hide=""><div id="toolbar-setting-container" hide=""><div class="toolbar-item"><button id="tool-color-mode" title="深色模式" type="button"><img src="/assets/images/svg/ta/ta-moon.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button class="copy-text" id="tool-share" title="分享" type="button" data-text="https://lwhaleee.github.io/2026/02/10/SSRF/"><img src="/assets/images/svg/ta/ta-share.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-font-size-plus" title="放大字体" type="button"><img src="/assets/images/svg/ta/ta-text-plus.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-font-size-minus" title="缩小字体" type="button"><img src="/assets/images/svg/ta/ta-text-minus.svg" class="icon noview" alt="Icon"></button></div></div><div class="toolbar-container"><div class="toolbar-item"><button id="tool-setting" title="设置" type="button"><img src="/assets/images/svg/ta/ta-setting.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-toc" title="目录" type="button"><img src="/assets/images/svg/ta/ta-toc.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-gototop" title="返回顶部" type="button"><img src="/assets/images/svg/ta/ta-up.svg" class="icon noview" alt="Icon"></button></div></div></div></main><footer><div class="footer"><div id="footer-copyright">© 2026 <span>💗</span> <a href="/null">LwhalE</a></div><div id="footer-info"><div id="footer-framework">🚀本站由 <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/chanwj/hexo-theme-meow" title="3.2.0" target="_blank">Meow</a> 强力驱动</div><div id="footer-runtime"><span id="runtime" data-startdate="2026-01-10T22:00:00.000Z">🌻已稳定运行.年.月.天</span></div></div></div></footer><div class="scripts"><script>const GLOBALCONFIG = {
+<link rel="prefetch" href="/"/><link rel="prefetch" href="/archives"/><link rel="prefetch" href="/tags"/><meta name="generator" content="Hexo 8.1.1"></head><body bg-style="none"><header><div id="navbar"><div id="nav-info"><a id="site-icon" href="/" title="主页"><img src="/images/Hexo-Theme-MEOW.png" alt="Logo"/></a><a id="site-name" href="/" title="主页"><div>LwhalE's blog</div><img src="/assets/images/svg/uc/uc-home.svg" class="icon noview" alt="Icon"></a></div><div id="nav-menu"><div class="menu-item"><a href="/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>首页</span></a></div><div class="menu-item"><a href="/archives"><img src="/assets/images/svg/uc/uc-archive.svg" class="icon noview" alt="Icon"><span>归档</span></a></div><div class="menu-item"><a href="/categories"><img src="/assets/images/svg/uc/uc-category.svg" class="icon noview" alt="Icon"><span>分类</span></a></div><div class="menu-item"><a href="/tags"><img src="/assets/images/svg/uc/uc-tag.svg" class="icon noview" alt="Icon"><span>标签</span></a></div><div class="menu-item"><a href="/about"><img src="/assets/images/svg/uc/uc-about.svg" class="icon noview" alt="Icon"><span>关于</span></a></div></div><div id="nav-function"><div id="menu-btn"><a href="javascript:void(0);" title="打开菜单"><img src="/assets/images/svg/uc/uc-menu.svg" class="icon noview" alt="Icon"></a></div></div></div></header><div id="menu-aside"><div id="menu-aside-container"><div id="menu-aside-info"><a href="/" title="主页"><img src="/images/Hexo-Theme-MEOW.png" alt="Logo"/></a><a href="/" title="主页">LwhalE's blog</a></div><div class="menu-aside-item"><a href="/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>首页</span></a></div><div class="menu-aside-item"><a href="/archives"><img src="/assets/images/svg/uc/uc-archive.svg" class="icon noview" alt="Icon"><span>归档</span></a></div><div class="menu-aside-item"><a href="/categories"><img src="/assets/images/svg/uc/uc-category.svg" class="icon noview" alt="Icon"><span>分类</span></a></div><div class="menu-aside-item"><a href="/tags"><img src="/assets/images/svg/uc/uc-tag.svg" class="icon noview" alt="Icon"><span>标签</span></a></div><div class="menu-aside-item"><a href="/about"><img src="/assets/images/svg/uc/uc-about.svg" class="icon noview" alt="Icon"><span>关于</span></a></div><hr/></div></div><main><div class="banner"><div class="banner-info"><div class="banner-avatar"><img src="/images/Hexo-Theme-MEOW.png" alt="Avatar"/></div><div class="banner-title">「 Lwhale's Blog 」</div></div></div><div class="post-container"><div class="post-main"><div class="post-content"><h1 class="post-title">SSRF</h1><div class="post-author"><span>作者: LwhalE</span></div><div class="post-meta"><div class="post-info"><div class="post-date"><div class="post-pubdate"><img src="/assets/images/svg/ta/ta-pubdate.svg" class="icon noview" alt="Icon"><span>发表于2026-02-10</span></div><div class="post-update"><img src="/assets/images/svg/ta/ta-update.svg" class="icon noview" alt="Icon"><span>更新于2026-03-14</span></div></div><div class="post-read"></div></div><div class="post-attribute"><div class="post-categories"><img src="/assets/images/svg/ta/ta-category.svg" class="icon noview" alt="Icon"><span><a class="post-categories-link" href="/categories/learning/">learning</a></span></div><div class="post-tags"><img src="/assets/images/svg/ta/ta-tag.svg" class="icon noview" alt="Icon"><span><a class="post-tags-link" href="/tags/web/" rel="tag">web</a></span></div></div></div><div class="post markdown" indent="false"><p>在之前学习文件包含的时候大概看过SSRF的攻击原理，主要是一种攻击方式的表示，请求资源的时候直接去获取内网资源。因此在理解这一块的过程中，我重新理了一下IP，主机，端口，域名以及内网的存在方式和关联方式</p>
+<h2 id="SSRF的原理和概念"><a href="#SSRF的原理和概念" class="headerlink" title="SSRF的原理和概念"></a>SSRF的原理和概念</h2><p>SSRF是Server-side Request Forge的缩写，中文翻译为服务端请求伪造。产生的原因是由于服务端提供了从其他服务器应用获取数据的功能且没有对地址和协议等做过滤和限制。</p>
+<p>SSRF 形成的原因大都是由于服务端提供了从其他服务器应用获取数据的功能，且没有对目标地址做过滤与限制。比如从指定URL地址获取网页文本内容，加载指定地址的图片，文档等等。SSRF漏洞通过篡改获取资源的请求发送给服务器（服务器并没有检测这个请求是否合法的），然后服务器以他的身份来访问服务器的其他资源。SSRF利用存在缺陷的Web应用作为代理攻击远程和本地的服务器。</p>
+<ul>
+<li><p>攻击者通过构造一个请求，让服务器去访问内网资源，然后把结果返回给攻击者，从而实现了对内网的访问。</p>
+<p>那么，为什么需要绕过呢？因为开发者可能会意识到SSRF的风险，所以对用户输入的URL做了一些限制（比如过滤内网IP、限制协议等）。攻击者为了突破这些限制，就需要使用一些技巧来绕过这些防护措施。</p>
+</li>
+<li><p><strong>PHP中下面函数的使用不当会导致SSRF：</strong></p>
+</li>
+</ul>
+<div class="code-container" code-lang="Php"><div class="codebox"><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_ invoke__">file_get_contents</span>()：将整个文件或一个url所指向的文件读入一个字符串中。</span><br><span class="line"></span><br><span class="line"><span class="title function_ invoke__">readfile</span>()：输出一个文件的内容。</span><br><span class="line"></span><br><span class="line"><span class="title function_ invoke__">fsockopen</span>()：打开一个网络连接或者一个Unix 套接字连接。</span><br><span class="line"></span><br><span class="line"><span class="title function_ invoke__">curl_exec</span>()：初始化一个新的会话，返回一个cURL句柄，供<span class="title function_ invoke__">curl_setopt</span>()，<span class="title function_ invoke__">curl_exec</span>()和<span class="title function_ invoke__">curl_close</span>() 函数使用。</span><br><span class="line"></span><br><span class="line"><span class="title function_ invoke__">fopen</span>()：打开一个文件文件或者 URL。</span><br></pre></td></tr></table></figure><div class="code-fold" title="Fold/Open"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 9l6 6l6 -6" /></svg></div><div class="code-copy" title="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"  stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z" /><path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" /></svg></div></div></div>
+
+<ul>
+<li><p><strong>伪协议</strong></p>
+<ul>
+<li>file协议： 在有回显的情况下，利用 file 协议可以读取任意文件的内容 (就是用来读passwd的方法)</li>
+<li>dict协议：泄露安装软件版本信息，查看端口，操作内网redis服务等（用来对内网的服务进行查询）</li>
+<li>gopher协议：gopher支持发出GET、POST请求。可以先截获get请求包和post请求包，再构造成符合gopher协议的请求。gopher协议是ssrf利用中一个最强大的协议(俗称万能协议)。可用于反弹shell (像是一个万能胶 可以模仿出POST和GET协议可以打很多服务例如Mysql，FastCGI，redis）</li>
+<li>http&#x2F;s协议：探测内网主机存活（探测存活主机）</li>
+</ul>
+</li>
+<li><p>挖掘SSRF漏洞：能够对外发起网络请求的地方，就可能存在SSRF漏洞。</p>
+</li>
+</ul>
+<h2 id="SSRF的可利用情景"><a href="#SSRF的可利用情景" class="headerlink" title="SSRF的可利用情景"></a>SSRF的可利用情景</h2><p>在具体利用场景和利用方式中提到了部分需要带一下的概念：</p>
+<ul>
+<li><p>DNS（Domain Name System，域名系统）是互联网的一项核心服务，被称为“互联网的电话簿”。它的作用是将人类可读的域名（如 example.com）转换为计算机能识别的数字IP地址（如 192.0.2.1），从而实现通过域名访问网站。DNS 采用分布式数据库技术，确保了网络访问的快速和稳定。<br>DNS 的核心细节与工作原理</p>
+<p>功能： 解决IP地址难记的问题。用户在浏览器输入网址时，DNS 负责在幕后将域名翻译成正确的 IP 地址。</p>
+<p>工作机制（解析过程）： 当用户输入域名时，系统会向 DNS 服务器发起查询，依次通过根域名服务器、顶级域名服务器、权威域名服务器找到对应记录，最后返回 IP 地址给浏览器。</p>
+<p>组成部分：</p>
+<ul>
+<li><p>DNS 记录（Records）： 存储域名与 IP 映射的文本记录，如 A 记录（域名对IP）。</p>
+</li>
+<li><p>DNS 服务器： 专门负责回答 DNS 查询的机器。</p>
+</li>
+<li><p>关键特性： 采用分布式系统，通过缓存（Cache）技术提高解析速度。</p>
+</li>
+</ul>
+</li>
+<li><p>API（Application Programming Interface，应用程序编程接口）是一组规则、协议和工具，允许不同的软件程序相互通信、交换数据和调用功能。它作为不同组件或系统之间的中介，使开发者无需从头开发，即可整合现有功能，提高开发效率并促进系统集成。 </p>
+<p>核心概览：</p>
+<p>功能与作用：API 允许系统安全、快速地分享数据和功能（如天气查询、登录认证），常用于连接前端和后端、将不同微服务连接起来。</p>
+<p>工作原理：当一个应用程序（客户端）向 API 服务器发送请求（Request）时，服务器处理请求并返回响应（Response），通常采用 JSON 或 XML 格式。</p>
+<p>常见类型：包括 <code>RESTful API</code>（最常用）、<code>SOAP</code>、<code>GraphQL</code>、<code>gRPC</code> 和 <code>WebSocket API</code>。</p>
+<p>典型应用：例如使用地图API将百度&#x2F;谷歌地图集成到自建网站、使用支付API处理线上交易、利用社交媒体API实现第三方登录。 </p>
+<p>API 与 SDK 的区别：</p>
+<p>API：是接口定义，仅提供访问服务的方法。</p>
+<p>SDK（Software Development Kit）：软件开发工具包，通常包含 API 以及相关的文档、工具和代码示例，是更完整的开发集成包。</p>
+</li>
+</ul>
+<p><strong>实际可能出现SSRF的场景：</strong></p>
+<ul>
+<li><p>从远程服务器请求资源（<code>Upload from URL,Import &amp;Export RSS feed</code>)</p>
+</li>
+<li><p>数据库内置功能(<code>Oracle[UTL_HTTP]、MongoDB、MSSQL、Postgres、CouchDB</code>)</p>
+</li>
+<li><p>Webmail 收取其它邮箱邮件（<code>POP3/IMAP/SMTP</code>)</p>
+</li>
+<li><p>文件处理，编码处理，属性信息处理（<code>ffpmg</code>,<code>ImageMaic</code>，<code>DOCX</code>，<code>PDF</code>，<code>XML</code>处理器）</p>
+</li>
+</ul>
+<p>利用条件：被攻击的服务等没有开启加密传输与鉴权。</p>
+<p><strong>利用技巧：</strong></p>
+<ul>
+<li><p>端口扫描（扫描内网）</p>
+</li>
+<li><p>攻击内网存在漏洞的服务</p>
+</li>
+<li><p>攻击Web应用进行指纹识别及其中的漏洞</p>
+</li>
+<li><p>如果PHP安装了expect扩展，可以通过expect协议执行系统命令</p>
+</li>
+<li><p>dos攻击</p>
+</li>
+<li><p>file 协议暴力枚举敏感文件</p>
+</li>
+<li><p><strong>Redis未授权漏洞的6种利用方法：</strong></p>
+<ul>
+<li><p>保存文件到<code>www</code>目录，形成<code>webshell</code></p>
+</li>
+<li><p>创建<code>authorized_keys</code>文件，利用<code>ssh</code> 私钥登录服务器</p>
+</li>
+<li><p>写计划任务(<code>/var/spool/cron/</code> &amp; <code>/etc/cron.d/</code>)</p>
+</li>
+<li><p><code>slave of 8.8.8.8</code> 主从模式利用</p>
+</li>
+<li><p>写入到<code>/etc/profile.d/</code> 用户环境变量修改</p>
+</li>
+<li><p>开启AOF持久化纯文本记录 <code>appendfilename</code></p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="具体利用"><a href="#具体利用" class="headerlink" title="具体利用"></a>具体利用</h2><h3 id="其他表示方式"><a href="#其他表示方式" class="headerlink" title="其他表示方式"></a>其他表示方式</h3><ul>
+<li>十进制IP：<code>127.0.0.1</code> → <code>2130706433</code></li>
+<li>八进制IP：<code>127.0.0.1</code> → <code>0177.0.0.1</code></li>
+<li>十六进制：<code>0x7f000001</code></li>
+<li>IPv6：<code>127.0.0.1</code> → <code>[::1]</code> 或 <code>localhost</code> → <code>ip6-localhost</code></li>
+</ul>
+<h3 id="利用域名解析："><a href="#利用域名解析：" class="headerlink" title="利用域名解析："></a>利用域名解析：</h3><ul>
+<li>注册域名 <code>attacker.com</code>，将其A记录指向 <code>192.168.1.1</code></li>
+<li>提交 <code>http://attacker.com</code>，防御代码看到的是域名，不是IP</li>
+</ul>
+<h3 id="使用指向本地的域名："><a href="#使用指向本地的域名：" class="headerlink" title="使用指向本地的域名："></a>使用指向本地的域名：</h3><ul>
+<li><code>127.0.0.1.nip.io</code>（自动解析到127.0.0.1），这个地方<code>xip.io</code>也可以</li>
+<li><code>localhost.example.com</code>（在自己的DNS服务器上解析到127.0.0.1）</li>
+<li>大小写变换：<code>LocalHost</code>、<code>LOCALHOST</code></li>
+<li>添加端口：<code>localhost:80</code> vs <code>localhost</code></li>
+<li>使用Unicode字符：<code>locålhost</code></li>
+</ul>
+<h3 id="重定向："><a href="#重定向：" class="headerlink" title="重定向："></a>重定向：</h3><ul>
+<li><p>当服务端对用户输入的URL进行校验时，可能会先检查域名或IP是否合法（例如是否属于内网）。但校验往往只针对初始URL，而忽略了后续可能发生的跳转。攻击者可以搭建一个外部服务器，该服务器返回一个HTTP 302重定向响应，将请求指向内网地址。服务端在收到重定向后，会跟随跳转并最终访问内网资源，从而绕过初始的校验。</p>
+<ol>
+<li>攻击者提交一个看似合法的URL（例如 <code>http://attacker.com/redirect</code>）。</li>
+<li>服务端校验该URL的域名 <code>attacker.com</code> 为外网地址，通过检查。</li>
+<li>服务端请求 <code>attacker.com/redirect</code>，该页面返回302状态码，并设置 <code>Location: http://192.168.1.1/admin</code>。</li>
+<li>服务端跟随跳转，最终请求了内网的 <code>192.168.1.1/admin</code>，获取敏感信息或执行操作。</li>
+</ol>
+<p>补充理解</p>
+<ul>
+<li>跳转类型：除了302，还有301永久重定向、307临时重定向等，均可利用。甚至可以利用一些开放在公网的跳转服务（如某些URL短链接服务）作为跳板。</li>
+<li>局限性：某些服务端库可能默认不允许跟随跳转（如PHP的 <code>allow_url_fopen</code> 默认不跟随），或可以配置最大跳转次数。但大多数HTTP客户端（如curl、Java的 <code>HttpURLConnection</code>）默认会跟随重定向。</li>
+<li>防御：禁用跟随重定向，或者对最终请求的URL再次进行校验。如果必须支持重定向，可以设置白名单或限制重定向的目标地址范围。</li>
+</ul>
+</li>
+</ul>
+<h3 id="存在协议限制"><a href="#存在协议限制" class="headerlink" title="存在协议限制"></a>存在协议限制</h3><ul>
+<li><strong>使用其他危险协议</strong>：<ul>
+<li><code>file://</code> 协议直接读取本地文件：<code>file:///etc/passwd</code></li>
+<li><code>dict://</code> 协议探测端口服务：<code>dict://127.0.0.1:3306/info</code></li>
+<li><code>gopher://</code> 协议（功能强大的旧协议，可以构造各种请求）</li>
+<li><code>ftp://</code> 协议等</li>
+</ul>
+</li>
+<li><strong>协议拼接</strong>：<ul>
+<li><code>http://127.0.0.1:80@evil.com</code>（利用@符号）</li>
+<li><code>http://localhost\\@evil.com</code>（利用解析差异）</li>
+</ul>
+</li>
+</ul>
+<h3 id="URL解析器的差异"><a href="#URL解析器的差异" class="headerlink" title="URL解析器的差异"></a>URL解析器的差异</h3><div class="code-container" code-lang="Python"><div class="codebox"><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 防御代码的解析（可能使用Python的urllib.parse）</span></span><br><span class="line">解析 <span class="string">&quot;http://evil.com@127.0.0.1&quot;</span> -&gt; 主机名是evil.com</span><br><span class="line"></span><br><span class="line"><span class="comment"># 但实际发起请求的库（如curl、requests）可能解析为：</span></span><br><span class="line">用户名为evil.com，主机名为<span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#简单说就是www.baidu.com@127.0.0.1则会跳转的127.0.0.1</span></span><br></pre></td></tr></table></figure><div class="code-fold" title="Fold/Open"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 9l6 6l6 -6" /></svg></div><div class="code-copy" title="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"  stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z" /><path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" /></svg></div></div></div>
+
+<p><strong>常见解析差异：</strong></p>
+<ul>
+<li><code>http://foo@127.0.0.1:80@example.com/</code> - 不同库解析出不同的主机</li>
+<li><code>http://127.0.0.1:80\\@example.com/</code> - 反斜杠处理差异</li>
+<li>URL编码差异：<code>http://%6c%6f%63%61%6c%68%6f%73%74</code> &#x3D; localhost</li>
+</ul>
+<h3 id="DNS重绑定利用解析时间差"><a href="#DNS重绑定利用解析时间差" class="headerlink" title="DNS重绑定利用解析时间差"></a>DNS重绑定利用解析时间差</h3><p>原理：DNS Rebinding利用了DNS解析的时间差。服务端通常会先对用户提供的域名进行DNS解析，获取IP地址并校验是否为内网IP。如果校验通过，服务端才会发起实际的HTTP请求（此时会再次解析域名）。攻击者控制一个域名，并设置非常短的TTL（生存时间），使得第一次解析时返回一个公网IP（通过校验），第二次解析时返回内网IP。由于两次解析的结果不同，最终请求被发送到内网，而校验阶段却认为域名是安全的。</p>
+<ol>
+<li>攻击者提交域名 <code>evil.com</code>，其DNS记录TTL设为0。</li>
+<li>服务端第一次解析 <code>evil.com</code>，得到IP <code>1.2.3.4</code>（公网），校验通过。</li>
+<li>服务端准备发起HTTP请求，此时再次解析 <code>evil.com</code>（因为TTL过期），得到内网IP <code>192.168.1.1</code>。</li>
+<li>服务端向 <code>192.168.1.1</code> 发送请求，成功访问内网。</li>
+</ol>
+<ul>
+<li><strong>TTL的作用</strong>：TTL决定了DNS记录在本地缓存的时间。攻击者设置极短的TTL（如0），确保每次查询都重新解析，从而实现两次解析返回不同IP。</li>
+<li><strong>客户端缓存差异</strong>：你提供的TIPS非常关键：“JAVA请求DNS成功会缓存30s，PHP默认没有缓存，linux不会缓存，windows和mac会”。这意味着DNS重绑定攻击的成功率取决于服务端所在环境以及编程语言&#x2F;库的DNS缓存行为。<ul>
+<li><strong>Java</strong>：JVM默认会对DNS查询结果进行缓存（<code>networkaddress.cache.ttl</code> 默认30秒，成功解析缓存30秒；负缓存10秒）。如果第一次解析结果被缓存，第二次请求直接使用缓存，就不会重新查询，攻击失败。但攻击者可以通过等待缓存过期或使用极短TTL迫使JVM重新查询（JVM是否遵守TTL取决于实现，通常忽略TTL而使用自己的缓存策略）。</li>
+<li><strong>PHP</strong>：默认不缓存DNS结果，每次请求都会重新解析，因此容易受DNS Rebinding攻击。</li>
+<li><strong>操作系统层面</strong>：Linux一般不会缓存DNS（除非启用了nscd等），而Windows和macOS有DNS缓存服务。不过，大多数编程语言有自己的DNS缓存机制或使用系统库，情况较复杂。</li>
+</ul>
+</li>
+<li><strong>绕过缓存的方法</strong>：如果存在缓存，攻击者可以尝试使用不同的域名、子域名或IP，或者等待缓存超时。此外，某些技术如“DNS Rebinding with multiple A records”也可尝试。</li>
+</ul>
+<h2 id="防御"><a href="#防御" class="headerlink" title="防御"></a>防御</h2><ol>
+<li>去除URL中的特殊字符</li>
+</ol>
+<ul>
+<li>防止内网的其他表达方式，防止攻击者利用URL编码、换行、空格、Unicode字符等绕过正则表达式或黑名单过滤。例如，<code>192.168.1.1</code>可能被写成<code>192。168。1。1</code>（中文句号）或<code>192.168.1。1</code>，通过特殊字符干扰IP格式检测。</li>
+</ul>
+<ol start="2">
+<li>判断是否属于内网IP，直接拒绝请求内网IP地址。</li>
+</ol>
+<ul>
+<li><p>阻止对私有IP范围（如<code>10.0.0.0/8</code>、<code>172.16.0.0/12</code>、<code>192.168.0.0/16</code>、<code>127.0.0.0/8</code>、<code>0.0.0.0/8</code>等）以及本地链路地址的访问。</p>
+<ul>
+<li>IP地址可能有多种表示形式（点分十进制、十六进制、八进制、整数等），需要先规范化为标准点分十进制后再进行判断。</li>
+<li>同时要考虑IPv6的私有地址范围（如<code>fc00::/7</code>、<code>::1</code>等）。</li>
+<li>如果业务需要访问某些内网资源（如内部API），应使用白名单而非单纯禁止。</li>
+</ul>
+</li>
+</ul>
+<ol start="3">
+<li>如果是域名，将URL中的域名改为IP</li>
+</ol>
+<ul>
+<li>提前解析域名得到IP，并用IP替换域名，后续请求直接使用IP，避免在请求阶段再次解析域名。<ul>
+<li>针对DNS Rebinding：因为DNS Rebinding利用的是两次解析（校验时和请求时）的时间差，而这里只解析一次并固化IP，彻底消除了时间差漏洞。</li>
+<li>同时也可以防止域名指向内网IP的简单绕过（因为解析后会直接发现IP属于内网，在步骤2就被拦截）。</li>
+</ul>
+</li>
+</ul>
+<ol start="4">
+<li>请求的URL为3中返回的URL</li>
+</ol>
+<ul>
+<li>确保实际请求的地址是基于步骤3解析出的IP构造的，而不是原始域名。</li>
+<li>防止后续任何依赖域名的攻击（如Host头注入、基于域名的访问控制绕过等）。</li>
+</ul>
+<ol start="5">
+<li>请求时设置Host Header为IP</li>
+</ol>
+<ul>
+<li><p>将HTTP请求的<code>Host</code>头设置为IP地址（而非原始域名）。</p>
+<ul>
+<li><p>防止攻击者通过域名触发服务端基于<code>Host</code>头的路由（例如某些内网服务根据<code>Host</code>头来区分虚拟主机），从而可能将请求导向预期外的内网应用。</p>
+</li>
+<li><p>也能避免某些利用<code>Host</code>头进行的缓存投毒或权限绕过攻击。</p>
+</li>
+<li><p>更安全的做法是在请求前校验<code>Host</code>头是否与解析后的IP匹配，或限制只允许特定<code>Host</code>值。</p>
+</li>
+</ul>
+</li>
+</ul>
+<ol start="6">
+<li>不跟随30x跳转（若需跟随则从步骤1重新检测）</li>
+</ol>
+<ul>
+<li>禁止自动跟随HTTP重定向，或者如果必须支持重定向，则对重定向后的URL重新执行整套检测流程。<ul>
+<li>递归检测时要防止无限循环（如跳转链过长或循环跳转），需设置最大跳转次数。</li>
+<li>有些重定向可能使用其他状态码（301、307等），都需要处理。</li>
+</ul>
+</li>
+</ul>
+</div><div class="post-reward"><div class="post-reward-btn" title="赞赏作者"><img src="/assets/images/svg/uc/uc-gift.svg" class="icon noview" alt="Icon"><span></span></div><div class="post-reward-content"><div class="post-reward-text"></div><div class="post-reward-list"><a href="/null" target="_blank">致谢名单</a></div></div></div><div class="post-copyright"><div class="post-copyright-info">本作品由 LwhalE 于 2026-02-10 15:19:01 发布</div><div class="post-copyright-link"><span>作品地址：<a href="https://lwhaleee.github.io/2026/02/10/SSRF/">SSRF</a></span><button class="copy-text" type="button" data-text="https://lwhaleee.github.io/2026/02/10/SSRF/">复制</button></div><div class="post-copyright-detail">除特别声明外，本站作品均采用 <a href='https://creativecommons.org/licenses/by-nc-sa/4.0/' title='Attribution-NonCommercial-ShareAlike' target='_blank'>CC BY-NC-SA 4.0</a> 许可协议，转载请注明来自 <a href='/'>LwhalE's blog</a></div><img class="post-copyright-icon noview" src="/images/Hexo-Theme-MEOW.png" alt="Logo"/></div><div class="post-tail-tags"><a class="post-tail-tags-link" href="/tags/web/" rel="tag">web</a></div></div><aside id="post-sidebar" status="show"><div id="toc-container"><div class="toc-title"><img src="/assets/images/svg/ta/ta-toc.svg" class="icon noview" alt="Icon"><span>目录</span></div><div class="toc-content" id="toc-div"><ol class="toc-list"><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#SSRF%E7%9A%84%E5%8E%9F%E7%90%86%E5%92%8C%E6%A6%82%E5%BF%B5"><span class="toc-list-text">SSRF的原理和概念</span></a></li><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#SSRF%E7%9A%84%E5%8F%AF%E5%88%A9%E7%94%A8%E6%83%85%E6%99%AF"><span class="toc-list-text">SSRF的可利用情景</span></a></li><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#%E5%85%B7%E4%BD%93%E5%88%A9%E7%94%A8"><span class="toc-list-text">具体利用</span></a><ol class="toc-list-child"><li class="toc-list-item toc-list-level-3"><a class="toc-list-link" href="#%E5%85%B6%E4%BB%96%E8%A1%A8%E7%A4%BA%E6%96%B9%E5%BC%8F"><span class="toc-list-text">其他表示方式</span></a></li><li class="toc-list-item toc-list-level-3"><a class="toc-list-link" href="#%E5%88%A9%E7%94%A8%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90%EF%BC%9A"><span class="toc-list-text">利用域名解析：</span></a></li><li class="toc-list-item toc-list-level-3"><a class="toc-list-link" href="#%E4%BD%BF%E7%94%A8%E6%8C%87%E5%90%91%E6%9C%AC%E5%9C%B0%E7%9A%84%E5%9F%9F%E5%90%8D%EF%BC%9A"><span class="toc-list-text">使用指向本地的域名：</span></a></li><li class="toc-list-item toc-list-level-3"><a class="toc-list-link" href="#%E9%87%8D%E5%AE%9A%E5%90%91%EF%BC%9A"><span class="toc-list-text">重定向：</span></a></li><li class="toc-list-item toc-list-level-3"><a class="toc-list-link" href="#%E5%AD%98%E5%9C%A8%E5%8D%8F%E8%AE%AE%E9%99%90%E5%88%B6"><span class="toc-list-text">存在协议限制</span></a></li><li class="toc-list-item toc-list-level-3"><a class="toc-list-link" href="#URL%E8%A7%A3%E6%9E%90%E5%99%A8%E7%9A%84%E5%B7%AE%E5%BC%82"><span class="toc-list-text">URL解析器的差异</span></a></li><li class="toc-list-item toc-list-level-3"><a class="toc-list-link" href="#DNS%E9%87%8D%E7%BB%91%E5%AE%9A%E5%88%A9%E7%94%A8%E8%A7%A3%E6%9E%90%E6%97%B6%E9%97%B4%E5%B7%AE"><span class="toc-list-text">DNS重绑定利用解析时间差</span></a></li></ol></li><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#%E9%98%B2%E5%BE%A1"><span class="toc-list-text">防御</span></a></li></ol></div></div></aside></div></div><div id="toolbar" hide=""><div id="toolbar-setting-container" hide=""><div class="toolbar-item"><button id="tool-color-mode" title="深色模式" type="button"><img src="/assets/images/svg/ta/ta-moon.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button class="copy-text" id="tool-share" title="分享" type="button" data-text="https://lwhaleee.github.io/2026/02/10/SSRF/"><img src="/assets/images/svg/ta/ta-share.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-font-size-plus" title="放大字体" type="button"><img src="/assets/images/svg/ta/ta-text-plus.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-font-size-minus" title="缩小字体" type="button"><img src="/assets/images/svg/ta/ta-text-minus.svg" class="icon noview" alt="Icon"></button></div></div><div class="toolbar-container"><div class="toolbar-item"><button id="tool-setting" title="设置" type="button"><img src="/assets/images/svg/ta/ta-setting.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-toc" title="目录" type="button"><img src="/assets/images/svg/ta/ta-toc.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-gototop" title="返回顶部" type="button"><img src="/assets/images/svg/ta/ta-up.svg" class="icon noview" alt="Icon"></button></div></div></div></main><footer><div class="footer"><div id="footer-copyright">© 2026 <span>💗</span> <a href="/null">LwhalE</a></div><div id="footer-info"><div id="footer-framework">🚀本站由 <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/chanwj/hexo-theme-meow" title="3.2.0" target="_blank">Meow</a> 强力驱动</div><div id="footer-runtime"><span id="runtime" data-startdate="2026-01-10T22:00:00.000Z">🌻已稳定运行.年.月.天</span></div></div></div></footer><div class="scripts"><script>const GLOBALCONFIG = {
   root: '/',
   toolbar: true,
   lazyload_src: '/assets/images/Meow-Loading.webp',
